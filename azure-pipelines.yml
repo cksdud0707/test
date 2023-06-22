@@ -1,19 +1,20 @@
-# Starter pipeline
-# Start with a minimal pipeline that you can customize to build and deploy your code.
-# Add steps that build, run tests, deploy, and more:
-# https://aka.ms/yaml
-
 trigger:
-- main
+  branches:
+    include:
+      - main  # 원하는 브랜치 이름으로 변경
 
 pool:
-  vmImage: ubuntu-latest
+  vmImage: 'ubuntu-latest'  # 사용할 빌드 에이전트 이미지 선택
 
 steps:
-- script: echo Hello, world!
-  displayName: 'Run a one-line script'
+- script: |
+    git config --global user.email "ssilly3@naver.com"
+    git config --global user.name "cksdud0707"
+    git clone https://github.com/cksdud0707/test # 가져올 Git 저장소의 URL로 대체
+  displayName: 'Clone repository'
 
 - script: |
-    echo Add other tasks to build, test, and deploy your project.
-    echo See https://aka.ms/yaml
-  displayName: 'Run a multi-line script'
+    cd test  # 클론된 저장소 디렉토리로 이동
+    # git pull origin <branch-name>  # 원하는 브랜치 이름으로 변경
+  displayName: 'Pull latest changes'
+
