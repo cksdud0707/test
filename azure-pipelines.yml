@@ -1,20 +1,46 @@
 trigger:
   branches:
     include:
-      - main  # 원하는 브랜치 이름으로 변경
+      - main  # 가져올 브랜치 이름
 
-pool:
-  vmImage: 'ubuntu-latest'  # 사용할 빌드 에이전트 이미지 선택
+jobs:
+- job: SyncCodeToCentOS
+  displayName: 'Sync Code to Azure CentOS 7.9'
+  pool:
+    vmImage: 'ubuntu-latest'  # 사용할 빌드 에이전트 이미지 선택
 
-steps:
-- script: |
-    git config --global user.email "ssilly3@naver.com"
-    git config --global user.name "cksdud0707"
-    git clone https://github.com/cksdud0707/test # 가져올 Git 저장소의 URL로 대체
-  displayName: 'Clone repository'
+  steps:
+  - task: AzureCLI@2
+    displayName: 'SSH to Azure CentOS 7.9'
+    inputs:
+      azureSubscription: 'Microsoft 파트너 네트워크'  # 사용할 Azure 구독 이름
+      scriptType: 'bash'
+      scriptLocation: 'inlineScript'
+      inlineScript: |
+        # Azure CentOS 7.9에 SSH로 접속
+        # SSH 접속 명령어를 적절히 변경해야 합니다.
+        ssh user@<centos-ip-address> -i <ssh-private-key-file>
 
-- script: |
-    cd test  # 클론된 저장소 디렉토리로 이동
-    # git pull origin <branch-name>  # 원하는 브랜치 이름으로 변경
-  displayName: 'Pull latest changes'
+  - task: GitCheckout@2
+    displayName: 'Checkout code from Git repository'
+    inputs:
+      repository: 'https://github.com/cksdud0707/test'  # 가져올 Git 저장소 URL
+      clean: true
 
+  - task: CopyFiles@2
+    displayName: 'Copy code to Azure CentOS 7.9'
+    inputs:
+      SourceFolder: '$(Build.SourcesDirectory)'  # 가져온 코드의 위치
+      Contents: '**'  # 모든 파일 및 폴더를 복사
+      TargetFolder: '/path/to/destination'  # 코드를 복사할 대상 디렉토리
+
+  - task: AzureCLI@2
+    displayName: 'Disconnect from Azure CentOS 7.9'
+    inputs:
+      azureSubscription: 'Microsoft 파트너 네트워크'  # 사용할 Azure 구독 이름
+      scriptType: 'bash'
+      scriptLocation: 'inlineScript'
+      inlineScript: |
+        # Azure CentOS 7.9에서 SSH 연결 해제
+        # SSH 연결 해제 명령어를 적절히 변경해야 합니다.
+        ssh cypark@4.230.40.195 exit
